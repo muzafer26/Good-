@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Compliments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            background-color: #f0f0f0;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            box-shadow: 0 0 10px rgba(115, 103, 240, 0.5);
+            background-color: #fff;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #7367f0, #ce9ffc);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(115, 103, 240, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(115, 103, 240, 0.6);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: none;
+            animation: fadeIn 1s;
+        }
+        
+        .compliment {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .name {
+            font-weight: bold;
+            color: #7367f0;
+        }
+        
+        .new-btn {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            margin-top: 15px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .emoji {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+        
+        .credit {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .compliment {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Type Your Name For a Surprise! ✨</h1>
+        <div id="input-section">
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="Enter your name here" autocomplete="off">
+            </div>
+            <button id="generateBtn">Get Your Surprise!</button>
+        </div>
+        
+        <div id="result" class="result">
+            <div id="complimentText" class="compliment"></div>
+            <button id="newComplimentBtn" class="new-btn">Show Another Surprise!</button>
+            <button id="resetBtn">Try Different Name</button>
+        </div>
+        
+        <div class="credit">Created with ❤️ for you</div>
+    </div>
+
+    <script>
+        const compliments = [
+            "NAME, your smile brightens everyone's day! ✨",
+            "NAME, you have an amazing ability to make people feel special. 🌟",
+            "NAME, your positive energy is truly contagious! 🌈",
+            "The world is a better place because NAME is in it! 💖",
+            "NAME, you're incredibly thoughtful and kind! 🥰",
+            "NAME, your creativity knows no bounds! 🎨",
+            "NAME, you have a heart of gold! 💛",
+            "The way NAME overcomes challenges is truly inspiring! 💪",
+            "NAME, your laughter is music to everyone's ears! 🎵",
+            "NAME, you radiate confidence and grace! 👑",
+            "NAME has a unique perspective that enriches everyone around them! 🔭",
+            "NAME, your determination is truly admirable! 🚀",
+            "Being friends with NAME is a true blessing! 🙏",
+            "NAME, you make even ordinary moments feel special! ✨",
+            "NAME, your intelligence and wit are impressive! 🧠",
+            "NAME, you're a ray of sunshine on cloudy days! ☀️",
+            "NAME, your kindness makes a difference every day! 💕",
+            "NAME, you have an incredible sense of style! 👓",
+            "NAME, your authenticity is refreshing and inspiring! 💯",
+            "NAME, you're talented in so many wonderful ways! 🌠"
+        ];
+
+        const generateBtn = document.getElementById('generateBtn');
+        const nameInput = document.getElementById('nameInput');
+        const inputSection = document.getElementById('input-section');
+        const result = document.getElementById('result');
+        const complimentText = document.getElementById('complimentText');
+        const newComplimentBtn = document.getElementById('newComplimentBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let currentName = "";
+        let usedCompliments = [];
+        
+        generateBtn.addEventListener('click', generateCompliment);
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateCompliment();
+            }
+        });
+        
+        newComplimentBtn.addEventListener('click', () => {
+            showCompliment();
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            result.style.display = 'none';
+            inputSection.style.display = 'block';
+            nameInput.value = '';
+            usedCompliments = [];
+            nameInput.focus();
+        });
+        
+        // Show a welcome message when page loads
+        window.addEventListener('load', () => {
+            nameInput.focus();
+        });
+        
+        function generateCompliment() {
+            const name = nameInput.value.trim();
+            
+            if (name === '') {
+                nameInput.placeholder = 'Please type your name first';
+                nameInput.classList.add('error');
+                setTimeout(() => {
+                    nameInput.placeholder = 'Enter your name here';
+                    nameInput.classList.remove('error');
+                }, 1500);
+                return;
+            }
+            
+            currentName = name;
+            usedCompliments = [];
+            
+            inputSection.style.display = 'none';
+            result.style.display = 'block';
+            
+            showCompliment();
+        }
+        
+        function showCompliment() {
+            // Reset if all compliments have been used
+            if (usedCompliments.length >= compliments.length) {
+                usedCompliments = [];
+            }
+            
+            // Find a compliment that hasn't been used yet
+            let availableCompliments = compliments.filter(c => !usedCompliments.includes(c));
+            let randomIndex = Math.floor(Math.random() * availableCompliments.length);
+            let compliment = availableCompliments[randomIndex];
+            
+            usedCompliments.push(compliment);
+            
+            // Replace NAME with the user's name
+            compliment = compliment.replace(/NAME/g, `<span class="name">${currentName}</span>`);
+            
+            // Animate showing the compliment
+            complimentText.style.opacity = '0';
+            setTimeout(() => {
+                complimentText.innerHTML = compliment;
+                complimentText.style.opacity = '1';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
